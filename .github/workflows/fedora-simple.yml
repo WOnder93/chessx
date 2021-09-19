@@ -1,0 +1,40 @@
+name: Simple Fedora CI
+on: [push, pull_request]
+jobs:
+  build-qmake-linked:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        dnf install -y \
+          qt5-qtbase-devel \
+          qt5-linguist \
+          'pkgconfig(Qt5Svg)' \
+          'pkgconfig(Qt5Multimedia)' \
+          'pkgconfig(quazip1-qt5)' \
+          'pkgconfig(zlib)'
+    - name: Run qmake
+      run: qmake-qt5 -r CONFIG+=link_pkgconfig .
+    - name: Run make
+      run: make -j$(nproc)
+  build-qmake-bundled:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        dnf install -y \
+          qt5-qtbase-devel \
+          qt5-linguist \
+          'pkgconfig(Qt5Svg)' \
+          'pkgconfig(Qt5Multimedia)' \
+          'pkgconfig(zlib)'
+    - name: Run qmake
+      run: qmake-qt5 -r .
+    - name: Run make
+      run: make -j$(nproc)
